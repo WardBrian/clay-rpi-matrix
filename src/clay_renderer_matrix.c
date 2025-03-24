@@ -35,11 +35,15 @@ static inline Clay_Dimensions Matrix_MeasureText(Clay_StringSlice text, Clay_Tex
 
     MonospacedFont *fonts = (MonospacedFont *)userData;
     MonospacedFont fontToUse = fonts[config->fontId];
-
+    // TODO: to support non-monospaced fonts, we need to measure each character
+    // Needs https://github.com/hzeller/rpi-rgb-led-matrix/issues/1775
+    // and something like utf8codepoint from https://github.com/sheredom/utf8.h
     textSize.width = (float)(fontToUse.width + config->letterSpacing) * text.length;
     textSize.height = (float)fontToUse.height;
     return textSize;
 }
+
+// TODO provide something like CLAY_TEXT for scrolling text?
 
 // A MALLOC'd buffer, that we keep modifying inorder to save from so many Malloc and Free Calls.
 // Call Clay_Matrix_Close() to free
@@ -152,7 +156,6 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
             break;
         }
 
-        // TODO: could be used for something scrolling-text-like?
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
         default:
