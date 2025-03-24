@@ -54,11 +54,11 @@ typedef enum
 } Corner;
 
 // even dumber
-void draw_arc(struct LedCanvas *c, int x, int y, int radius, Corner corner,
+void draw_arc(struct LedCanvas *c, int x, int y, int radius, int innerRadius, Corner corner,
               uint8_t r, uint8_t g, uint8_t b)
 {
     int r2 = radius * radius;
-    int rm12 = (radius - 1) * (radius - 1);
+    int ir2 = (innerRadius) * (innerRadius);
 
     int i_start, i_end, j_start, j_end;
     switch (corner)
@@ -94,7 +94,7 @@ void draw_arc(struct LedCanvas *c, int x, int y, int radius, Corner corner,
         for (int j = j_start; j <= j_end; j++)
         {
             int ij2 = i * i + j * j;
-            if (i * i + j * j <= r2 && ij2 > rm12)
+            if (i * i + j * j <= r2 && ij2 > ir2)
             {
                 led_canvas_set_pixel(c, x + i, y + j, r, g, b);
             }
@@ -138,22 +138,26 @@ void draw_border(struct LedCanvas *canvas, int bbX, int bbY, int bbWidth, int bb
     // corners
     if (topLeftRadius > 0)
     {
-        draw_arc(canvas, bbX + topLeftRadius, bbY + topLeftRadius, topLeftRadius, TOP_LEFT,
+        draw_arc(canvas, bbX + topLeftRadius, bbY + topLeftRadius,
+                 topLeftRadius, topLeftRadius - config->width.top, TOP_LEFT,
                  r, g, b);
     }
     if (topRightRadius > 0)
     {
-        draw_arc(canvas, bbX + bbWidth - 1 - topRightRadius, bbY + topRightRadius, topRightRadius, TOP_RIGHT,
+        draw_arc(canvas, bbX + bbWidth - 1 - topRightRadius, bbY + topRightRadius,
+                 topRightRadius, topRightRadius - config->width.top, TOP_RIGHT,
                  r, g, b);
     }
     if (bottomLeftRadius > 0)
     {
-        draw_arc(canvas, bbX + bottomLeftRadius, bbY + bbHeight - 1 - bottomLeftRadius, bottomLeftRadius, BOTTOM_LEFT,
+        draw_arc(canvas, bbX + bottomLeftRadius, bbY + bbHeight - 1 - bottomLeftRadius,
+                 bottomLeftRadius, bottomLeftRadius - config->width.bottom, BOTTOM_LEFT,
                  r, g, b);
     }
     if (bottomRightRadius > 0)
     {
-        draw_arc(canvas, bbX + bbWidth - 1 - bottomRightRadius, bbY + bbHeight - 1 - bottomRightRadius, bottomRightRadius, BOTTOM_RIGHT,
+        draw_arc(canvas, bbX + bbWidth - 1 - bottomRightRadius, bbY + bbHeight - 1 - bottomRightRadius,
+                 bottomRightRadius, bottomRightRadius - config->width.bottom, BOTTOM_RIGHT,
                  r, g, b);
     }
 }
