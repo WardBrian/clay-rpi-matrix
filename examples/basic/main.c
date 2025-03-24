@@ -45,6 +45,7 @@ Clay_RenderCommandArray CreateLayout(void)
                          .padding = {2, 2, 0, 1}},
               .border = {.width = CLAY_BORDER_ALL(1),
                          .color = {240, 240, 10, 255}},
+              .cornerRadius = CLAY_CORNER_RADIUS(3),
               .backgroundColor = {0, 240, 100, 255}})
         {
             CLAY_TEXT(CLAY_STRING("Bye now!"), CLAY_TEXT_CONFIG({.fontId = FONT_ID_4X6,

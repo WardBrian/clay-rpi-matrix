@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "../clay/clay.h"
 #include "../rpi-rgb-led-matrix/include/led-matrix-c.h"
-
+#include "matrix_helpers.c"
 
 typedef struct
 {
@@ -128,66 +129,88 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
         {
             Clay_RectangleRenderData *config = &renderCommand->renderData.rectangle;
 
-            // todo: rounded corners?
-            for (int x = bbX; x < bbX + bbWidth; x++)
+            uint8_t r = (uint8_t)config->backgroundColor.r;
+            uint8_t g = (uint8_t)config->backgroundColor.g;
+            uint8_t b = (uint8_t)config->backgroundColor.b;
+            if (config->cornerRadius.topLeft > 0)
             {
-                for (int y = bbY; y < bbY + bbHeight; y++)
-                {
-                    led_canvas_set_pixel(canvas, x, y,
-                                         (uint8_t)config->backgroundColor.r, (uint8_t)config->backgroundColor.g, (uint8_t)config->backgroundColor.b);
-                }
+                // TODO -- allow non-symmetric corner radius?
+                draw_rounded_rectangle(canvas, bbX, bbY, bbWidth, bbHeight, (int)config->cornerRadius.topLeft,
+                                       r, g, b);
             }
-
+            else
+            {
+                draw_rectangle(canvas, bbX, bbY, bbWidth, bbHeight, r, g, b);
+            }
             break;
         }
 
         case CLAY_RENDER_COMMAND_TYPE_BORDER:
         {
             Clay_BorderRenderData *config = &renderCommand->renderData.border;
-            // todo: rounded corners?
-
             uint8_t r = (uint8_t)config->color.r;
             uint8_t g = (uint8_t)config->color.g;
             uint8_t b = (uint8_t)config->color.b;
 
+            int topLeftRadius = (int)config->cornerRadius.topLeft;
+            int bottomLeftRadius = (int)config->cornerRadius.bottomLeft;
+            int topRightRadius = (int)config->cornerRadius.topRight;
+            int bottomRightRadius = (int)config->cornerRadius.bottomRight;
+
             // Left border
             for (int x = bbX; x < bbX + config->width.left; x++)
             {
-                draw_line(canvas, x, bbY, x, bbY + bbHeight - 1, r, g, b);
+                draw_line(canvas, x, bbY + topLeftRadius, x, bbY + bbHeight - 1 - bottomLeftRadius, r, g, b);
             }
             // Right border
             for (int x = bbX + bbWidth - config->width.right; x < bbX + bbWidth; x++)
             {
-                draw_line(canvas, x, bbY, x, bbY + bbHeight - 1, r, g, b);
+                draw_line(canvas, x, bbY + topRightRadius, x, bbY + bbHeight - 1 - bottomRightRadius, r, g, b);
             }
             // Top border
             for (int y = bbY; y < bbY + config->width.top; y++)
             {
-                draw_line(canvas, bbX, y, bbX + bbWidth - 1, y, r, g, b);
+                draw_line(canvas, bbX + topLeftRadius, y, bbX + bbWidth - 1 - topRightRadius, y, r, g, b);
             }
             // Bottom border
             for (int y = bbY + bbHeight - config->width.bottom; y < bbY + bbHeight; y++)
             {
-                draw_line(canvas, bbX, y, bbX + bbWidth - 1, y, r, g, b);
+                draw_line(canvas, bbX + bottomLeftRadius, y, bbX + bbWidth - 1 - bottomRightRadius, y, r, g, b);
+            }
+
+            // corners
+            if (topLeftRadius > 0)
+            {
+                draw_arc(canvas, bbX + topLeftRadius, bbY + topLeftRadius, topLeftRadius, TOP_LEFT,
+                         r, g, b);
+            }
+            if (topRightRadius > 0)
+            {
+                draw_arc(canvas, bbX + bbWidth - 1 - topRightRadius, bbY + topRightRadius, topRightRadius, TOP_RIGHT,
+                         r, g, b);
+            }
+            if (bottomLeftRadius > 0)
+            {
+                draw_arc(canvas, bbX + bottomLeftRadius, bbY + bbHeight - 1 - bottomLeftRadius, bottomLeftRadius, BOTTOM_LEFT,
+                         r, g, b);
+            }
+            if (bottomRightRadius > 0)
+            {
+                draw_arc(canvas, bbX + bbWidth - 1 - bottomRightRadius, bbY + bbHeight - 1 - bottomRightRadius, bottomRightRadius, BOTTOM_RIGHT,
+                         r, g, b);
             }
 
             break;
         }
 
-        case CLAY_RENDER_COMMAND_TYPE_CUSTOM:
-        {
-            // TODO: allow circles?
-            break;
-        }
-
+        // TODO: could be used for something scrolling-text-like?
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
-        {
-            // TODO: could be used for something scrolling-text-like?
-            break;
-        }
         default:
-            break;
+        {
+            printf("Error: unhandled render command.");
+            exit(1);
+        }
         }
     }
     canvas = led_matrix_swap_on_vsync(matrix, canvas);

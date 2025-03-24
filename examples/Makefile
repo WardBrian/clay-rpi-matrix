@@ -9,9 +9,11 @@ LDLIBS=-lrgbmatrix -lm -lstdc++ -lrt
 
 all: basic.exe
 
-basic/main.o: basic/main.c ../src/clay_renderer_matrix.c
+SRCS=$(wildcard ../src/*.c)
 
-basic.exe: basic/main.o ../src/clay_renderer_matrix.c $(RGB_LIBRARY)
+basic/main.o: basic/main.c $(SRCS)
+
+basic.exe: basic/main.o $(RGB_LIBRARY)
 	$(LINK.c) -o basic.exe basic/main.o $(LDFLAGS) $(LDLIBS)
 
 .PHONY: all clean

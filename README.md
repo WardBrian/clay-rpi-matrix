@@ -24,8 +24,6 @@ If run on a 64x32 panel, the example program looks like:
 
 If you'd like to help out, these are the features that are not yet implemented:
 
-- Rounded corners
 - Scrolling/scissor regions
-- Custom elements (circles, mainly)
 - Better image support
 - Non-monospaced fonts
