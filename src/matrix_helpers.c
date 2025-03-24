@@ -32,6 +32,19 @@ void draw_rectangle(struct LedCanvas *c, int x, int y, int width, int height,
     }
 }
 
+void draw_rounded_rectangle(struct LedCanvas *c, int x, int y, int width, int height, int radius,
+                            uint8_t r, uint8_t g, uint8_t b)
+{
+    // draw the four corners
+    draw_filled_circle(c, x + radius, y + radius, radius, r, g, b);
+    draw_filled_circle(c, x + width - radius - 1, y + radius, radius, r, g, b);
+    draw_filled_circle(c, x + radius, y + height - radius - 1, radius, r, g, b);
+    draw_filled_circle(c, x + width - radius - 1, y + height - radius - 1, radius, r, g, b);
+    // draw a plus sign to fill in the gaps
+    draw_rectangle(c, x + radius, y, width - (radius * 2), height, r, g, b);
+    draw_rectangle(c, x, y + radius, width, height - (radius * 2), r, g, b);
+}
+
 typedef enum
 {
     TOP_LEFT,
@@ -89,15 +102,58 @@ void draw_arc(struct LedCanvas *c, int x, int y, int radius, Corner corner,
     }
 }
 
-void draw_rounded_rectangle(struct LedCanvas *c, int x, int y, int width, int height, int radius,
-                            uint8_t r, uint8_t g, uint8_t b)
+void draw_border(struct LedCanvas *canvas, int bbX, int bbY, int bbWidth, int bbHeight,
+                 Clay_BorderRenderData *config)
 {
-    // draw the four corners
-    draw_filled_circle(c, x + radius, y + radius, radius, r, g, b);
-    draw_filled_circle(c, x + width - radius - 1, y + radius, radius, r, g, b);
-    draw_filled_circle(c, x + radius, y + height - radius - 1, radius, r, g, b);
-    draw_filled_circle(c, x + width - radius - 1, y + height - radius - 1, radius, r, g, b);
-    // draw a plus sign to fill in the gaps
-    draw_rectangle(c, x + radius, y, width - (radius * 2), height, r, g, b);
-    draw_rectangle(c, x, y + radius, width, height - (radius * 2), r, g, b);
+    uint8_t r = (uint8_t)config->color.r;
+    uint8_t g = (uint8_t)config->color.g;
+    uint8_t b = (uint8_t)config->color.b;
+
+    int topLeftRadius = (int)config->cornerRadius.topLeft;
+    int bottomLeftRadius = (int)config->cornerRadius.bottomLeft;
+    int topRightRadius = (int)config->cornerRadius.topRight;
+    int bottomRightRadius = (int)config->cornerRadius.bottomRight;
+
+    // Left border
+    for (int x = bbX; x < bbX + config->width.left; x++)
+    {
+        draw_line(canvas, x, bbY + topLeftRadius, x, bbY + bbHeight - 1 - bottomLeftRadius, r, g, b);
+    }
+    // Right border
+    for (int x = bbX + bbWidth - config->width.right; x < bbX + bbWidth; x++)
+    {
+        draw_line(canvas, x, bbY + topRightRadius, x, bbY + bbHeight - 1 - bottomRightRadius, r, g, b);
+    }
+    // Top border
+    for (int y = bbY; y < bbY + config->width.top; y++)
+    {
+        draw_line(canvas, bbX + topLeftRadius, y, bbX + bbWidth - 1 - topRightRadius, y, r, g, b);
+    }
+    // Bottom border
+    for (int y = bbY + bbHeight - config->width.bottom; y < bbY + bbHeight; y++)
+    {
+        draw_line(canvas, bbX + bottomLeftRadius, y, bbX + bbWidth - 1 - bottomRightRadius, y, r, g, b);
+    }
+
+    // corners
+    if (topLeftRadius > 0)
+    {
+        draw_arc(canvas, bbX + topLeftRadius, bbY + topLeftRadius, topLeftRadius, TOP_LEFT,
+                 r, g, b);
+    }
+    if (topRightRadius > 0)
+    {
+        draw_arc(canvas, bbX + bbWidth - 1 - topRightRadius, bbY + topRightRadius, topRightRadius, TOP_RIGHT,
+                 r, g, b);
+    }
+    if (bottomLeftRadius > 0)
+    {
+        draw_arc(canvas, bbX + bottomLeftRadius, bbY + bbHeight - 1 - bottomLeftRadius, bottomLeftRadius, BOTTOM_LEFT,
+                 r, g, b);
+    }
+    if (bottomRightRadius > 0)
+    {
+        draw_arc(canvas, bbX + bbWidth - 1 - bottomRightRadius, bbY + bbHeight - 1 - bottomRightRadius, bottomRightRadius, BOTTOM_RIGHT,
+                 r, g, b);
+    }
 }
