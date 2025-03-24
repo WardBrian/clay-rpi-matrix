@@ -26,7 +26,8 @@ Clay_RenderCommandArray CreateLayout(void)
     {
         CLAY({.id = CLAY_ID("Box1"),
               .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM,
-                         .padding = {1, 0, 0, 0},
+                         .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER},
+                         .padding = {1, 0, 1, 0},
                          .sizing = {.width = CLAY_SIZING_FIT(32),
                                     .height = CLAY_SIZING_FIXED(8)}},
               .backgroundColor = {150, 100, 255, 255}})
@@ -42,7 +43,7 @@ Clay_RenderCommandArray CreateLayout(void)
                          .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER},
                          .sizing = {.width = CLAY_SIZING_FIT(32),
                                     .height = CLAY_SIZING_FIXED(12)},
-                         .padding = {2, 2, 0, 1}},
+                         .padding = {2, 2, 1, 1}},
               .border = {.width = CLAY_BORDER_ALL(1),
                          .color = {240, 240, 10, 255}},
               .cornerRadius = CLAY_CORNER_RADIUS(3),

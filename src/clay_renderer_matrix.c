@@ -103,7 +103,7 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
             memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
             temp_render_buffer[textData->stringContents.length] = '\0';
 
-            int y = bbY + fontToUse.height;
+            int y = bbY + baseline_font(fontToUse.font);
             draw_text(canvas, fontToUse.font, bbX, y,
                       (uint8_t)textData->textColor.r, (uint8_t)textData->textColor.g, (uint8_t)textData->textColor.b,
                       temp_render_buffer, textData->letterSpacing);
