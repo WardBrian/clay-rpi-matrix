@@ -4,3 +4,6 @@
 [submodule "submodules/rpi-rgb-led-matrix"]
 	path = submodules/rpi-rgb-led-matrix
 	url = https://github.com/WardBrian/rpi-rgb-led-matrix.git
+[submodule "submodules/utf8.h"]
+	path = submodules/utf8.h
+	url = https://github.com/sheredom/utf8.h.git

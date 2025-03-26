@@ -99,9 +99,9 @@ int main(int argc, char **argv)
     Clay_Arena clayMemory = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
     Clay_Initialize(clayMemory, (Clay_Dimensions){(float)options.cols, (float)options.rows}, (Clay_ErrorHandler){HandleClayErrors, 0});
 
-    MonospacedFont fonts[2];
-    fonts[FONT_ID_4X6] = load_monospaced_font("../submodules/rpi-rgb-led-matrix/fonts/4x6.bdf", 4);
-    fonts[FONT_ID_5X7] = load_monospaced_font("../submodules/rpi-rgb-led-matrix/fonts/5x7.bdf", 5);
+    struct LedFont *fonts[2];
+    fonts[FONT_ID_4X6] = load_font("../submodules/rpi-rgb-led-matrix/fonts/4x6.bdf");
+    fonts[FONT_ID_5X7] = load_font("../submodules/rpi-rgb-led-matrix/fonts/5x7.bdf");
     Clay_SetMeasureTextFunction(Matrix_MeasureText, fonts);
 
     signal(SIGINT, exitCtrlC);

@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "../submodules/clay/clay.h"
+#include "../submodules/utf8.h/utf8.h"
 #include "../submodules/rpi-rgb-led-matrix/include/led-matrix-c.h"
 #include "matrix_helpers.c"
 
@@ -13,33 +14,22 @@ typedef struct
 } ImageCounted;
 // TODO loader, maybe using MagickWand?
 
-typedef struct
-{
-    struct LedFont *font;
-    int width;
-    int height;
-} MonospacedFont;
-
-MonospacedFont load_monospaced_font(const char *bdf_font_file, int width)
-{
-    MonospacedFont font;
-    font.font = load_font(bdf_font_file);
-    font.width = width;
-    font.height = height_font(font.font);
-    return font;
-}
-
 static inline Clay_Dimensions Matrix_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData)
 {
     Clay_Dimensions textSize = {0};
 
-    MonospacedFont *fonts = (MonospacedFont *)userData;
-    MonospacedFont fontToUse = fonts[config->fontId];
-    // TODO: to support non-monospaced fonts, we need to measure each character
-    // Needs https://github.com/hzeller/rpi-rgb-led-matrix/issues/1775
-    // and something like utf8codepoint from https://github.com/sheredom/utf8.h
-    textSize.width = (float)(fontToUse.width + config->letterSpacing) * text.length;
-    textSize.height = (float)fontToUse.height;
+    struct LedFont **fonts = (struct LedFont **)userData;
+    struct LedFont *fontToUse = fonts[config->fontId];
+
+    const char *current = text.chars;
+    while (current < text.chars + text.length)
+    {
+        utf8_int32_t codepoint;
+        current = utf8codepoint(current, &codepoint);
+        textSize.width += (float)(character_width_font(fontToUse, (uint32_t)codepoint) + config->letterSpacing);
+    }
+
+    textSize.height = (float)height_font(fontToUse);
     return textSize;
 }
 
@@ -72,7 +62,7 @@ void Clay_Matrix_Close()
     led_matrix_delete(matrix);
 }
 
-void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *fonts)
+void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, struct LedFont **fonts)
 {
     led_canvas_clear(canvas);
 
@@ -90,7 +80,7 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
         case CLAY_RENDER_COMMAND_TYPE_TEXT:
         {
             Clay_TextRenderData *textData = &renderCommand->renderData.text;
-            MonospacedFont fontToUse = fonts[textData->fontId];
+            struct LedFont *fontToUse = fonts[textData->fontId];
 
             int strlen = textData->stringContents.length + 1;
 
@@ -107,8 +97,8 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
             memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
             temp_render_buffer[textData->stringContents.length] = '\0';
 
-            int y = bbY + baseline_font(fontToUse.font);
-            draw_text(canvas, fontToUse.font, bbX, y,
+            int y = bbY + baseline_font(fontToUse);
+            draw_text(canvas, fontToUse, bbX, y,
                       (uint8_t)textData->textColor.r, (uint8_t)textData->textColor.g, (uint8_t)textData->textColor.b,
                       temp_render_buffer, textData->letterSpacing);
 
