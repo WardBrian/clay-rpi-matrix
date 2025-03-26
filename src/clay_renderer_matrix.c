@@ -121,7 +121,7 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
 
             ImageCounted *image = (ImageCounted *)renderCommand->renderData.image.imageData;
 
-            // TODO tint color?
+            // TODO tint color? rounded corners?
             set_image(canvas, bbX, bbY,
                       image->imageData, image->length,
                       (int)imageData->sourceDimensions.width, (int)imageData->sourceDimensions.height,
@@ -132,23 +132,9 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, MonospacedFont *
         case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
         {
             Clay_RectangleRenderData *config = &renderCommand->renderData.rectangle;
-
-            uint8_t r = (uint8_t)config->backgroundColor.r;
-            uint8_t g = (uint8_t)config->backgroundColor.g;
-            uint8_t b = (uint8_t)config->backgroundColor.b;
-            if (config->cornerRadius.topLeft > 0)
-            {
-                // TODO -- allow non-symmetric corner radius?
-                draw_rounded_rectangle(canvas, bbX, bbY, bbWidth, bbHeight, (int)config->cornerRadius.topLeft,
-                                       r, g, b);
-            }
-            else
-            {
-                draw_rectangle(canvas, bbX, bbY, bbWidth, bbHeight, r, g, b);
-            }
+            draw_rounded_rectangle(canvas, bbX, bbY, bbWidth, bbHeight, config);
             break;
         }
-
         case CLAY_RENDER_COMMAND_TYPE_BORDER:
         {
             Clay_BorderRenderData *config = &renderCommand->renderData.border;

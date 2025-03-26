@@ -19,8 +19,8 @@ void draw_filled_circle(struct LedCanvas *c, int x, int y, int radius,
     }
 }
 
-void draw_rectangle(struct LedCanvas *c, int x, int y, int width, int height,
-                    uint8_t r, uint8_t g, uint8_t b)
+void draw_rectangle_basic(struct LedCanvas *c, int x, int y, int width, int height,
+                          uint8_t r, uint8_t g, uint8_t b)
 {
 
     for (int i = 0; i < width; i++)
@@ -32,17 +32,68 @@ void draw_rectangle(struct LedCanvas *c, int x, int y, int width, int height,
     }
 }
 
-void draw_rounded_rectangle(struct LedCanvas *c, int x, int y, int width, int height, int radius,
-                            uint8_t r, uint8_t g, uint8_t b)
+int max(int a, int b)
 {
+    return a > b ? a : b;
+}
+
+void draw_rounded_rectangle(struct LedCanvas *c, int x, int y, int width, int height, Clay_RectangleRenderData *config)
+{
+
+    uint8_t r = (uint8_t)config->backgroundColor.r;
+    uint8_t g = (uint8_t)config->backgroundColor.g;
+    uint8_t b = (uint8_t)config->backgroundColor.b;
+
+    int topLeftRadius = (int)config->cornerRadius.topLeft;
+    int topRightRadius = (int)config->cornerRadius.topRight;
+    int bottomLeftRadius = (int)config->cornerRadius.bottomLeft;
+    int bottomRightRadius = (int)config->cornerRadius.bottomRight;
+
+    int left = max(topLeftRadius, bottomLeftRadius);
+    int right = max(topRightRadius, bottomRightRadius);
+    int top = max(topLeftRadius, topRightRadius);
+    int bottom = max(bottomLeftRadius, bottomRightRadius);
+
     // draw the four corners
-    draw_filled_circle(c, x + radius, y + radius, radius, r, g, b);
-    draw_filled_circle(c, x + width - radius - 1, y + radius, radius, r, g, b);
-    draw_filled_circle(c, x + radius, y + height - radius - 1, radius, r, g, b);
-    draw_filled_circle(c, x + width - radius - 1, y + height - radius - 1, radius, r, g, b);
+    if (topLeftRadius > 0)
+    {
+        draw_filled_circle(c, x + topLeftRadius, y + topLeftRadius, topLeftRadius, r, g, b);
+    }
+    else
+    {
+        draw_rectangle_basic(c, x, y, left, top, r, g, b);
+    }
+
+    if (topRightRadius > 0)
+    {
+        draw_filled_circle(c, x + width - topRightRadius - 1, y + topRightRadius, topRightRadius, r, g, b);
+    }
+    else
+    {
+        draw_rectangle_basic(c, x + width - right, y, right, top, r, g, b);
+    }
+
+    if (bottomLeftRadius > 0)
+    {
+        draw_filled_circle(c, x + bottomLeftRadius, y + height - bottomLeftRadius - 1, bottomLeftRadius, r, g, b);
+    }
+    else
+    {
+        draw_rectangle_basic(c, x, y + height - bottom, left, bottom, r, g, b);
+    }
+
+    if (bottomRightRadius > 0)
+    {
+        draw_filled_circle(c, x + width - bottomRightRadius - 1, y + height - bottomRightRadius - 1, bottomRightRadius, r, g, b);
+    }
+    else
+    {
+        draw_rectangle_basic(c, x + width - right, y + height - bottom, right, bottom, r, g, b);
+    }
+
     // draw a plus sign to fill in the gaps
-    draw_rectangle(c, x + radius, y, width - (radius * 2), height, r, g, b);
-    draw_rectangle(c, x, y + radius, width, height - (radius * 2), r, g, b);
+    draw_rectangle_basic(c, x + left, y, width - left - right, height, r, g, b);
+    draw_rectangle_basic(c, x, y + top, width, height - top - bottom, r, g, b);
 }
 
 typedef enum
