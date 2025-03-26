@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "../rpi-rgb-led-matrix/include/led-matrix-c.h"
+#include "../submodules/rpi-rgb-led-matrix/include/led-matrix-c.h"
 
 // pretty dumb, but it works
 void draw_filled_circle(struct LedCanvas *c, int x, int y, int radius,

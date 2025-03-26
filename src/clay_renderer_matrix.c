@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "../clay/clay.h"
-#include "../rpi-rgb-led-matrix/include/led-matrix-c.h"
+#include "../submodules/clay/clay.h"
+#include "../submodules/rpi-rgb-led-matrix/include/led-matrix-c.h"
 #include "matrix_helpers.c"
 
 typedef struct

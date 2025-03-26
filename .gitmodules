@@ -1,6 +1,6 @@
-[submodule "rpi-rgb-led-matrix"]
-	path = rpi-rgb-led-matrix
-	url = https://github.com/hzeller/rpi-rgb-led-matrix.git
-[submodule "clay"]
-	path = clay
+[submodule "submodules/clay"]
+	path = submodules/clay
 	url = https://github.com/nicbarker/clay.git
+[submodule "submodules/rpi-rgb-led-matrix"]
+	path = submodules/rpi-rgb-led-matrix
+	url = https://github.com/WardBrian/rpi-rgb-led-matrix.git

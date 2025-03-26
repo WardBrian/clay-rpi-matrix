@@ -3,7 +3,8 @@
 This repository contains a simple renderer for the [`clay`](https://github.com/nicbarker/clay) UI
 layout library that targets Raspberry Pi matrix LED panels.
 
-The matrix panel itself is driven by [`rpi-rgb-led-matrix`](https://github.com/hzeller/rpi-rgb-led-matrix).
+The matrix panel itself is driven by [`rpi-rgb-led-matrix`](https://github.com/hzeller/rpi-rgb-led-matrix)
+(currently my fork for [one extra feature](https://github.com/hzeller/rpi-rgb-led-matrix/issues/1775)).
 
 ## Usage
 

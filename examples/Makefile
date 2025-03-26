@@ -1,10 +1,9 @@
-
-
-
-RGB_LIBRARY=../rpi-rgb-led-matrix/lib/librgbmatrix.a
+RGB_SOURCE=../submodules/rpi-rgb-led-matrix
+RGB_LIB=$(RGB_SOURCE)/lib
+RGB_LIBRARY=$(RGB_LIB)/librgbmatrix.a
 
 CFLAGS=-Wall -Wextra -O2
-LDFLAGS=-L../rpi-rgb-led-matrix/lib
+LDFLAGS=-L$(RGB_LIB)
 LDLIBS=-lrgbmatrix -lm -lstdc++ -lrt
 
 all: basic.exe
@@ -21,5 +20,5 @@ clean:
 	rm -f basic/*.o basic.exe
 
 $(RGB_LIBRARY):
-	@$(MAKE) -C ../rpi-rgb-led-matrix
+	@$(MAKE) -C $(RGB_SOURCE)
 
