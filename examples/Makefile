@@ -2,7 +2,7 @@ RGB_SOURCE=../submodules/rpi-rgb-led-matrix
 RGB_LIB=$(RGB_SOURCE)/lib
 RGB_LIBRARY=$(RGB_LIB)/librgbmatrix.a
 
-CFLAGS=-Wall -Wextra -O2
+CFLAGS=-Wall -Wextra -Wno-unknown-pragmas -O2
 LDFLAGS=-L$(RGB_LIB)
 LDLIBS=-lrgbmatrix -lm -lstdc++ -lrt
 

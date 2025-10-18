@@ -2,6 +2,7 @@
 #include "../../src/clay_renderer_matrix.c"
 #include <signal.h>
 #include <time.h>
+#include <errno.h>
 
 #define FONT_ID_4X6 0
 #define FONT_ID_5X7 1
@@ -15,7 +16,7 @@ void exitCtrlC(int)
 Clay_RenderCommandArray CreateLayout(void)
 {
     Clay_BeginLayout();
-    CLAY({.id = CLAY_ID("Background"),
+    CLAY(CLAY_ID("Background"), {
           .layout = {.childGap = 2,
                      .childAlignment = {CLAY_ALIGN_X_CENTER},
                      .layoutDirection = CLAY_TOP_TO_BOTTOM,
@@ -24,7 +25,7 @@ Clay_RenderCommandArray CreateLayout(void)
                      .padding = CLAY_PADDING_ALL(2)},
           .backgroundColor = {25, 25, 75, 255}})
     {
-        CLAY({.id = CLAY_ID("Box1"),
+        CLAY(CLAY_ID("Box1"), {
               .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM,
                          .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER},
                          .padding = {1, 0, 1, 0},
@@ -38,7 +39,7 @@ Clay_RenderCommandArray CreateLayout(void)
                                                                  .wrapMode = CLAY_TEXT_WRAP_NONE}));
         }
 
-        CLAY({.id = CLAY_ID("Box2"),
+        CLAY(CLAY_ID("Box2"), {
               .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM,
                          .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER},
                          .sizing = {.width = CLAY_SIZING_FIT(32),
@@ -56,7 +57,7 @@ Clay_RenderCommandArray CreateLayout(void)
                                                                  .wrapMode = CLAY_TEXT_WRAP_NONE}));
         }
 
-        CLAY({.id = CLAY_ID("Error"),
+        CLAY(CLAY_ID("Error"), {
               .backgroundColor = {168, 66, 28, 255},
               .layout = {
                   .padding = CLAY_PADDING_ALL(2),
@@ -88,6 +89,25 @@ void HandleClayErrors(Clay_ErrorData errorData)
         reinitializeClay = true;
         Clay_SetMaxMeasureTextCacheWordCount(Clay_GetMaxMeasureTextCacheWordCount() * 2);
     }
+}
+
+
+
+void check_file_exists(const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Couldn't open file %s. %s\n", filename, strerror(errno));
+        exit(1);
+    }
+    fclose(file);
+}
+
+struct LedFont* safe_load_font(const char *bdf_font_file)
+{
+    check_file_exists(bdf_font_file);
+    return load_font(bdf_font_file);
 }
 
 int main(int argc, char **argv)
@@ -132,6 +152,11 @@ int main(int argc, char **argv)
     }
 
     Clay_Matrix_Close();
+
+    for (int i = 0; i < 2; i++)
+    {
+        delete_font(fonts[i]);
+    }
 
     return 0;
 }

@@ -11,6 +11,7 @@ typedef struct
 {
     uint8_t *imageData;
     size_t length;
+    int32_t height, width;
 } ImageCounted;
 // TODO loader, maybe using MagickWand?
 
@@ -81,7 +82,7 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, struct LedFont *
         {
             Clay_TextRenderData *textData = &renderCommand->renderData.text;
             struct LedFont *fontToUse = fonts[textData->fontId];
-
+            
             int strlen = textData->stringContents.length + 1;
 
             if (strlen > temp_render_buffer_len)
@@ -108,13 +109,12 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, struct LedFont *
         {
 
             Clay_ImageRenderData *imageData = &renderCommand->renderData.image;
-
-            ImageCounted *image = (ImageCounted *)renderCommand->renderData.image.imageData;
+            ImageCounted *image = (ImageCounted *)imageData->imageData;
 
             // TODO tint color? rounded corners?
             set_image(canvas, bbX, bbY,
                       image->imageData, image->length,
-                      (int)imageData->sourceDimensions.width, (int)imageData->sourceDimensions.height,
+                      image->width, image->height,
                       /* is_bgr */ 0);
 
             break;
@@ -131,9 +131,15 @@ void Clay_Matrix_Render(Clay_RenderCommandArray renderCommands, struct LedFont *
             draw_border(canvas, bbX, bbY, bbWidth, bbHeight, config);
             break;
         }
+        case CLAY_RENDER_COMMAND_TYPE_NONE:
+        {
+            // Do nothing
+            break;
+        }
 
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
         case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
+        // TODO
         default:
         {
             printf("Error: unhandled render command.");

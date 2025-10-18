@@ -133,6 +133,7 @@ void draw_arc(struct LedCanvas *c, int x, int y, int radius, int innerRadius, Co
         j_end = radius;
         break;
     case BOTTOM_RIGHT:
+    default:
         i_start = 0;
         i_end = radius;
         j_start = 0;
